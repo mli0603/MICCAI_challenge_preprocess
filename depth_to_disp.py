@@ -1,5 +1,6 @@
 import cv2
 import json
+import os
 from os.path import join, splitext, split
 from os import listdir
 import tifffile as tiff
@@ -78,11 +79,19 @@ def read_Q(reprojection_file):
 
 def depth_to_disparity(path):
     rootpath = path
-    keyframe_list = ['keyframe_4']
+    keyframe_list = [join(rootpath, kf) for kf in listdir(rootpath) if ('keyframe' in kf and 'ignore' not in kf)]
     for kf in keyframe_list:
-        reprojection_filepath = join(rootpath, kf) + '/data/reprojection_data'
         coor_filepath = join(rootpath,kf) + '/data/scene_points'
+
+        if not os.path.isdir(coor_filepath):
+            continue
+
+        reprojection_filepath = join(rootpath, kf) + '/data/reprojection_data'
         disp_filepath = join(rootpath,kf) + '/data/disparity'
+
+        if not os.path.isdir(disp_filepath):
+            os.mkdir(disp_filepath)
+
         frame_list = listdir(reprojection_filepath)
 
         for i in range(len(frame_list)):
@@ -95,7 +104,6 @@ def depth_to_disparity(path):
             img_l, img_r = tiff_reader(coor_data)
             disp = coor_to_disp(img_l, Q)
             cv2.imwrite(disp_data, disp)
-
 
 
 

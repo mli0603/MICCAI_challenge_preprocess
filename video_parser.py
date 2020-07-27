@@ -1,3 +1,4 @@
+import os
 from os import listdir
 from os.path import isfile, join, splitext
 import cv2
@@ -30,6 +31,13 @@ def video_parser(path):
     for kf in keyframe_list:
         video_file = join(rootpath, kf) + '/data/rgb.mp4'
         rgb_filepath = join(rootpath, kf) + '/data/rgb_data'
+        
+        if not os.path.isfile(video_file):
+            continue
+        
+        if not os.path.isdir(rgb_filepath):
+            os.mkdir(rgb_filepath)
+            print('directory created')
 
         parse_video(video_file, rgb_filepath)
 
